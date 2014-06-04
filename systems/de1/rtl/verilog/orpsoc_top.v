@@ -354,6 +354,9 @@ mor1kx	#(
 //
 ////////////////////////////////////////////////////////////////////////
 
+wire	uart0_irq;
+assign	wb_s2m_uart0_rty = 0;
+
 adbg_top dbg_if0 (
 	// OR1K interface
 	.cpu0_clk_i	(wb_clk),
@@ -391,7 +394,21 @@ adbg_top dbg_if0 (
 	.wb_sel_o	(wb_m2s_dbg_sel),
 	.wb_we_o	(wb_m2s_dbg_we),
 	.wb_cti_o	(wb_m2s_dbg_cti),
-	.wb_bte_o	(wb_m2s_dbg_bte)
+	.wb_bte_o	(wb_m2s_dbg_bte),
+
+	.wb_jsp_adr_i	(wb_m2s_uart0_adr),
+	.wb_jsp_dat_o	(wb_s2m_uart0_dat),
+	.wb_jsp_dat_i	(wb_m2s_uart0_dat),
+	.wb_jsp_cyc_i	(wb_m2s_uart0_cyc),
+	.wb_jsp_stb_i	(wb_m2s_uart0_stb),
+	.wb_jsp_sel_i	(wb_m2s_uart0_sel),
+	.wb_jsp_we_i	(wb_m2s_uart0_we),
+	.wb_jsp_ack_o	(wb_s2m_uart0_ack),
+	.wb_jsp_cab_i	(),
+	.wb_jsp_err_o	(wb_s2m_uart0_err),
+	.wb_jsp_cti_i	(wb_m2s_uart0_cti),
+	.wb_jsp_bte_i	(wb_m2s_uart0_bte),
+	.int_o		(uart0_irq)
 );
 
 ////////////////////////////////////////////////////////////////////////
@@ -502,11 +519,8 @@ wb_sdram_ctrl0 (
 //
 ////////////////////////////////////////////////////////////////////////
 
-wire	uart0_irq;
-
+/*
 assign	wb_s2m_uart0_err = 0;
-assign	wb_s2m_uart0_rty = 0;
-
 uart_top uart16550_0 (
 	// Wishbone slave interface
 	.wb_clk_i	(wb_clk),
@@ -533,7 +547,7 @@ uart_top uart16550_0 (
 	.ri_pad_i	(1'b0),
 	.dcd_pad_i	(1'b0)
 );
-
+*/
 ////////////////////////////////////////////////////////////////////////
 //
 // GPIO 0
