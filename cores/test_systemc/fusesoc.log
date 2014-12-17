@@ -1,0 +1,9 @@
+DEBUG:__main__:Command line arguments: ['/usr/local/bin/fusesoc', 'sim', 'test_systemc']
+DEBUG:fusesoc.config:Looking for config files from /etc/fusesoc/fusesoc.conf:/home/franck/.config/fusesoc/fusesoc.conf:fusesoc.conf
+DEBUG:fusesoc.config:Found config files in /home/franck/.config/fusesoc/fusesoc.conf
+DEBUG:fusesoc.config:build_root=/home/franck/openrisc/work/orpsoc-cores/cores/test_systemc/build
+DEBUG:fusesoc.config:cache_root=/home/franck/.cache/fusesoc
+DEBUG:fusesoc.config:cores_root=ll
+DEBUG:fusesoc.config:Not defined
+DEBUG:fusesoc.coremanager:Checking for cores in ll
+DEBUG:__main__:Autodetected 64-bit mode

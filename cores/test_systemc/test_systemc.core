@@ -1,0 +1,14 @@
+CAPI=1
+[main]
+description = "SystemC test project"
+simulators = verilator
+
+[verilator]
+verilator_options = -Wno-fatal --trace
+tb_toplevel   = sc_main.cpp
+source_type = systemC
+src_files = sc_main.cpp
+top_module = gpio
+
+[verilog]
+src_files = gpio.v
