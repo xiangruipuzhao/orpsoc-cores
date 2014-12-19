@@ -1,16 +1,51 @@
 #include <systemc.h>
 #include <stdint.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include "/home/franck/openrisc/work/fusesoc/build/test_systemc/sim-verilator/obj_dir/Vgpio.h"
 #include "wb_master.h"
+#include "wb_xfer.h"
 
 Vgpio *DUT  = new Vgpio("Vgpio");
 wb_master *MASTER = new wb_master("wb_master");
 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void xfer_finished(void)
+{
+	cout << "Xfer finished" << endl;
+}
+
+void wb_write32(struct wb_xfer *xfer, uint32_t addr, uint32_t data,
+		void (*done)(void))
+{
+	xfer->cyc = 1;
+	xfer->stb = 1;
+	xfer->adr = addr;
+	xfer->we  = 0;
+	xfer->dat_o = data;
+	xfer->done = done;
+	MASTER->setup_xfer(xfer);
+
+	pthread_mutex_lock(xfer->work);
+	pthread_mutex_unlock(xfer->work);
+}
+
 void *test_thread(void *arg)
 {
-	sleep(1);
-	MASTER->drive_e1();
+	struct wb_xfer xfer;
+	xfer.work = &mutex;
+
+	usleep(10);
+
+	wb_write32(&xfer, 0x5588, 0x65, NULL);
+
+	wb_write32(&xfer, 0x11223344, 0x998877EE, xfer_finished);
+
+	usleep(10);
+
+	sc_stop();
+
 	pthread_exit(0);
 }
 
@@ -34,11 +69,6 @@ int sc_main(int argc, char* argv[])
 	sc_signal	< uint32_t >	gpio_i;
 	sc_signal	< uint32_t >	gpio_o;
 	sc_signal	< uint32_t >	gpio_dir;
-
-	if (pthread_create (&th1, NULL, test_thread, NULL) < 0) {
-		printf("pthread_create error for thread 1\n");
-		exit (1);
-	}
 
 	sc_clock clk("clk", 10, SC_NS, 0.5);   // Create a clock signal
 
@@ -85,8 +115,16 @@ int sc_main(int argc, char* argv[])
 	sc_trace(fp, wb_cyc, "wb_cyc");             // Add signals to trace file
 	sc_trace(fp, wb_stb, "wb_stb");             // Add signals to trace file
 	sc_trace(fp, wb_dat_i, "wb_dat_i");             // Add signals to trace file
+	sc_trace(fp, wb_dat_o, "wb_dat_o");             // Add signals to trace file
+	sc_trace(fp, wb_we, "wb_we");             // Add signals to trace file
+	sc_trace(fp, wb_ack, "wb_ack");             // Add signals to trace file
 
-	sc_start(1000, SC_MS);                // Run simulation
+	if (pthread_create (&th1, NULL, test_thread, NULL) < 0) {
+		printf("pthread_create error for thread 1\n");
+		exit (1);
+	}
+
+	sc_start();                // Run simulation
 
 	sc_close_vcd_trace_file(fp);        // close(fp)
 
