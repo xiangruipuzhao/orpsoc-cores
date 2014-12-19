@@ -17,7 +17,7 @@ module gpio
 	input			wb_clk,
 	input			wb_rst,
 
-	input			wb_adr_i,
+	input		[7:0]	wb_adr_i, 
 	input		[7:0] 	wb_dat_i,
 	input			wb_we_i,
 	input			wb_cyc_i,

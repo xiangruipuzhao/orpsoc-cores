@@ -8,7 +8,9 @@ verilator_options = -Wno-fatal --trace
 tb_toplevel   = sc_main.cpp
 source_type = systemC
 src_files = sc_main.cpp
+include_files = wb_master.h
 top_module = gpio
+libs = -lpthread
 
 [verilog]
 src_files = gpio.v

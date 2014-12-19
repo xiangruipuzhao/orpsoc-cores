@@ -1,34 +1,61 @@
-//------------------------------------------------------------------
-// Simple Testbench for dff flipflop file
-//
-// SystemC for VHDL engineers
-// (c)www.ht-lab.com
-//------------------------------------------------------------------
-
 #include <systemc.h>
-#include "Vgpio.h"
+#include <stdint.h>
+#include <pthread.h>
+#include "/home/franck/openrisc/work/fusesoc/build/test_systemc/sim-verilator/obj_dir/Vgpio.h"
+#include "wb_master.h"
+
+Vgpio *DUT  = new Vgpio("Vgpio");
+wb_master *MASTER = new wb_master("wb_master");
+
+void *test_thread(void *arg)
+{
+	sleep(1);
+	MASTER->drive_e1();
+	pthread_exit(0);
+}
 
 int sc_main(int argc, char* argv[])
 {
-	sc_signal < bool > rst;
-	sc_signal < bool > wb_adr;
-	sc_signal < uint32_t > wb_dat_i;
-	sc_signal < bool > wb_we;
-	sc_signal < bool > wb_cyc;
-	sc_signal < bool > wb_stb;
-	sc_signal < uint32_t > wb_cti;
-	sc_signal < uint32_t > wb_bte;
-	sc_signal < uint32_t > wb_dat_o;
-	sc_signal < bool > wb_ack;
-	sc_signal < bool > wb_err;
-	sc_signal < bool > wb_rty;
-	sc_signal < uint32_t > gpio_i;
-	sc_signal < uint32_t > gpio_o;
-	sc_signal < uint32_t > gpio_dir;
+	pthread_t th1;
+	void *ret;
+
+	sc_signal	< bool >	rst;
+	sc_signal	< uint32_t >	wb_adr;
+	sc_signal	< uint32_t >	wb_dat_i;
+	sc_signal	< bool >	wb_we;
+	sc_signal	< bool >	wb_cyc;
+	sc_signal	< bool >	wb_stb;
+	sc_signal	< uint32_t >	wb_cti;
+	sc_signal	< uint32_t >	wb_bte;
+	sc_signal	< uint32_t >	wb_dat_o;
+	sc_signal	< bool >	wb_ack;
+	sc_signal	< bool >	wb_err;
+	sc_signal	< bool >	wb_rty;
+	sc_signal	< uint32_t >	gpio_i;
+	sc_signal	< uint32_t >	gpio_o;
+	sc_signal	< uint32_t >	gpio_dir;
+
+	if (pthread_create (&th1, NULL, test_thread, NULL) < 0) {
+		printf("pthread_create error for thread 1\n");
+		exit (1);
+	}
 
 	sc_clock clk("clk", 10, SC_NS, 0.5);   // Create a clock signal
 
-	Vgpio *DUT  = new Vgpio("Vgpio");
+	MASTER->clk(clk);
+	MASTER->rst(rst);
+
+	MASTER->wb_adr(wb_adr);
+	MASTER->wb_dat_i(wb_dat_o);
+	MASTER->wb_we(wb_we);
+	MASTER->wb_cyc(wb_cyc);
+	MASTER->wb_stb(wb_stb);
+	MASTER->wb_cti(wb_cti);
+	MASTER->wb_bte(wb_bte);
+	MASTER->wb_dat_o(wb_dat_i);
+	MASTER->wb_ack(wb_ack);
+	MASTER->wb_err(wb_err);
+	MASTER->wb_rty(wb_rty);
 
 	DUT->wb_clk(clk);
 	DUT->wb_rst(rst);
@@ -59,22 +86,11 @@ int sc_main(int argc, char* argv[])
 	sc_trace(fp, wb_stb, "wb_stb");             // Add signals to trace file
 	sc_trace(fp, wb_dat_i, "wb_dat_i");             // Add signals to trace file
 
-	rst = 1;
-	sc_start(31, SC_NS);                // Run simulation
-	rst = 0;
-	sc_start(200, SC_NS);                // Run simulation
-
-	wb_adr = 1;
-	wb_cyc = 1;
-	wb_stb = 1;
-	wb_dat_i = 0xff;
-	sc_start(10, SC_NS);                // Run simulation
-
-	wb_cyc = 0;
-	wb_stb = 0;
-	sc_start(10, SC_NS);                // Run simulation
+	sc_start(1000, SC_MS);                // Run simulation
 
 	sc_close_vcd_trace_file(fp);        // close(fp)
+
+	(void)pthread_join (th1, &ret);
 
 	return 0;                           // Return no errors
 }
