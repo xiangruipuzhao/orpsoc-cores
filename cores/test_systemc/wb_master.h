@@ -19,14 +19,17 @@ SC_MODULE(wb_master) {
 	sc_in	< bool >	wb_err;
 	sc_in	< bool >	wb_rty;
 
-	sc_event e1, e2;
+	sc_event e2;
 	bool local_ack;
 	bool xfer_started;
 
-	struct wb_xfer *local_xfer;
+	struct wb_xfer xfer;
 	thread_safe_event safe_ev;
 	bool do_poll_ack_rdy;
 	bool do_xfer_rdy;
+
+	pthread_mutex_t mutex;
+	pthread_cond_t cond;
 
 	int master_ready() {
 		return do_poll_ack_rdy & do_xfer_rdy;
@@ -37,9 +40,9 @@ SC_MODULE(wb_master) {
 			do_poll_ack_rdy = 1;
 			wait();
 			if (wb_ack && xfer_started) {
-				pthread_mutex_lock(local_xfer->mutex);
+				pthread_mutex_lock(xfer.mutex);
 				xfer_started = 0;
-				pthread_mutex_unlock(local_xfer->mutex);
+				pthread_mutex_unlock(xfer.mutex);
 				e2.notify(SC_ZERO_TIME);
 			}
 			local_ack = wb_ack;
@@ -50,25 +53,25 @@ SC_MODULE(wb_master) {
 		while (true) {
 			do_xfer_rdy = 1;
 			wait(safe_ev.default_event());
-			wb_cyc = local_xfer->cyc;
-			wb_stb = local_xfer->stb;
-			wb_adr = local_xfer->adr;
-			wb_we  = local_xfer->we;
-			wb_dat_o = local_xfer->dat_o;
-			pthread_mutex_lock(local_xfer->mutex);
+			wb_cyc = xfer.cyc;
+			wb_stb = xfer.stb;
+			wb_adr = xfer.adr;
+			wb_we  = xfer.we;
+			wb_dat_o = xfer.dat_o;
+			pthread_mutex_lock(xfer.mutex);
 			xfer_started = 1;
-			pthread_mutex_unlock(local_xfer->mutex);
+			pthread_mutex_unlock(xfer.mutex);
 			wait(e2);
 			wb_cyc = 0;
 			wb_stb = 0;
 
-			pthread_mutex_lock(local_xfer->mutex);
-			local_xfer->busy = 0;
-			pthread_cond_signal(local_xfer->cond);
-			pthread_mutex_unlock(local_xfer->mutex);
+			pthread_mutex_lock(xfer.mutex);
+			xfer.busy = 0;
+			pthread_cond_signal(xfer.cond);
+			pthread_mutex_unlock(xfer.mutex);
 
-			if (local_xfer->done)
-				local_xfer->done();
+			if (xfer.done)
+				xfer.done();
 		}
 	}
 
@@ -84,10 +87,15 @@ SC_MODULE(wb_master) {
 
 		do_poll_ack_rdy = 0;
 		do_xfer_rdy = 0;
+
+		pthread_mutex_init(&mutex, 0);
+		pthread_cond_init(&cond, 0);
+
+		xfer.mutex = &mutex;
+		xfer.cond = &cond;
 	}
 
-	void setup_xfer(struct wb_xfer *xfer) {
-		local_xfer = xfer;
+	void start_xfer() {
 		safe_ev.notify();
 	}
 };

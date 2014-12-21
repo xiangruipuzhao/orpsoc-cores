@@ -9,46 +9,38 @@
 Vgpio *DUT  = new Vgpio("Vgpio");
 wb_master *MASTER = new wb_master("wb_master");
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-
 void xfer_finished(void)
 {
 	cout << "Xfer finished" << endl;
 }
 
-void wb_write32(struct wb_xfer *xfer, uint32_t addr, uint32_t data,
-		void (*done)(void))
+void wb_write32(uint32_t addr, uint32_t data, void (*done)(void))
 {
-	xfer->cyc = 1;
-	xfer->stb = 1;
-	xfer->adr = addr;
-	xfer->we  = 0;
-	xfer->dat_o = data;
-	xfer->done = done;
-	xfer->busy = 1;
+	MASTER->xfer.cyc = 1;
+	MASTER->xfer.stb = 1;
+	MASTER->xfer.adr = addr;
+	MASTER->xfer.we  = 0;
+	MASTER->xfer.dat_o = data;
+	MASTER->xfer.done = done;
+	MASTER->xfer.busy = 1;
 
-	MASTER->setup_xfer(xfer);
+	MASTER->start_xfer();
 
-	pthread_mutex_lock(xfer->mutex);
-	while (xfer->busy)
-		pthread_cond_wait(xfer->cond, xfer->mutex);
-	pthread_mutex_unlock(xfer->mutex);
+	pthread_mutex_lock(MASTER->xfer.mutex);
+	while (MASTER->xfer.busy)
+		pthread_cond_wait(MASTER->xfer.cond, MASTER->xfer.mutex);
+	pthread_mutex_unlock(MASTER->xfer.mutex);
 }
 
 void *test_thread(void *arg)
 {
-	struct wb_xfer xfer;
-	xfer.mutex = &mutex;
-	xfer.cond = &cond;
-
 	while(!(MASTER->master_ready()));
 
 	usleep(10);
 
-	wb_write32(&xfer, 0x5588, 0x65, NULL);
+	wb_write32(0x5588, 0x65, NULL);
 
-	wb_write32(&xfer, 0x11223344, 0x998877EE, xfer_finished);
+	wb_write32(0x11223344, 0x998877EE, xfer_finished);
 
 	usleep(10);
 
