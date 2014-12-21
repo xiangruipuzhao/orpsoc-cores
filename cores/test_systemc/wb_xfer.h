@@ -16,8 +16,10 @@ struct wb_xfer {
 	bool err;
 	bool rty;
 
+	bool busy;
 	void (*done)(void);
-	pthread_mutex_t *work;
+	pthread_mutex_t *mutex;
+	pthread_cond_t *cond;
 };
 
 #endif

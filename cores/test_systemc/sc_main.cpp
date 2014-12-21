@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include "/home/franck/openrisc/work/fusesoc/build/test_systemc/sim-verilator/obj_dir/Vgpio.h"
+#include "/home/franck/openrisc/upstream/fusesoc/build/test_systemc/sim-verilator/obj_dir/Vgpio.h"
 #include "wb_master.h"
 #include "wb_xfer.h"
 
@@ -10,6 +10,7 @@ Vgpio *DUT  = new Vgpio("Vgpio");
 wb_master *MASTER = new wb_master("wb_master");
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
 void xfer_finished(void)
 {
@@ -25,16 +26,23 @@ void wb_write32(struct wb_xfer *xfer, uint32_t addr, uint32_t data,
 	xfer->we  = 0;
 	xfer->dat_o = data;
 	xfer->done = done;
+	xfer->busy = 1;
+
 	MASTER->setup_xfer(xfer);
 
-	pthread_mutex_lock(xfer->work);
-	pthread_mutex_unlock(xfer->work);
+	pthread_mutex_lock(xfer->mutex);
+	while (xfer->busy)
+		pthread_cond_wait(xfer->cond, xfer->mutex);
+	pthread_mutex_unlock(xfer->mutex);
 }
 
 void *test_thread(void *arg)
 {
 	struct wb_xfer xfer;
-	xfer.work = &mutex;
+	xfer.mutex = &mutex;
+	xfer.cond = &cond;
+
+	while(!(MASTER->master_ready()));
 
 	usleep(10);
 
