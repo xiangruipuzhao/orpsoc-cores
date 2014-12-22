@@ -5,12 +5,18 @@ simulators = verilator
 
 [verilator]
 verilator_options = -Wno-fatal --trace
-tb_toplevel   = sc_main.cpp
+tb_toplevel   = bench/sc_main.cpp
 source_type = systemC
-src_files = sc_main.cpp
-include_files = wb_master.h wb_xfer.h thread_safe_event.h
+src_files = bench/sc_main.cpp
+
+include_files =
+ bench/wb_master.h
+ bench/wb_xfer.h
+ bench/thread_safe_event.h
+ bench/or1ksim.h
+
 top_module = gpio
-libs = -lpthread
+libs = -L/opt/or1ksim/lib -lsim -lpthread
 
 [verilog]
 src_files = gpio.v
