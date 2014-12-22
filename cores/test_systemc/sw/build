@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ ! -d ${BUILD_ROOT}/sw ]; then
+	mkdir ${BUILD_ROOT}/sw
+fi
+cp ${CORE_ROOT}/sw/or1k_main.c ${BUILD_ROOT}/sw
+make
