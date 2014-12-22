@@ -1,6 +1,22 @@
-CROSS_COMPILE=/opt/or1k-toolchain/bin/or1k-elf-gcc
+CFLAGS= -I. -Wall
 
-all:
-	${CROSS_COMPILE} -o or1k_main or1k_main.c
+.PHONY: default all clean
+
+default: $(TARGET)
+all: clean default
+
+OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
+HEADERS = $(wildcard *.h)
+
+%.o: %.c $(HEADERS)
+	@$(CROSS_COMPILE) $(CFLAGS) -c $< -o $@
+
+.PRECIOUS: $(TARGET) $(OBJECTS)
+
+$(TARGET): $(OBJECTS)
+	@$(CROSS_COMPILE) $(OBJECTS) -Wall -o $@
+
+
 clean:
-	rm -f or1k_main testlib *.o *.~
+	-rm -f *.o *.~
+	-rm -f $(TARGET)
