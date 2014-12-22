@@ -10,6 +10,9 @@
 Vgpio *DUT  = new Vgpio("Vgpio");
 wb_master *MASTER = new wb_master("wb_master");
 
+char **local_argv;
+int local_argc;
+
 void xfer_finished(void)
 {
 	cout << "Xfer finished" << endl;
@@ -62,13 +65,6 @@ int generic_write(void *class_ptr, unsigned long int addr, unsigned char mask[],
 void *test_thread(void *arg)
 {
 	int ret;
-	char *local_argv[4];
-	int local_argc = 4;
-
-	local_argv[0] = "test_systemc";
-	local_argv[1] = "-f";
-	local_argv[2] = "/home/franck/or1ksim.cfg";
-	local_argv[3] = "/home/franck/or1k_main";
 
 	while(!(MASTER->master_ready()));
 
@@ -118,7 +114,12 @@ int sc_main(int argc, char* argv[])
 
 	printf(" ***** %s\n", argv[0]);
 	printf(" ***** %s\n", argv[1]);
-	printf(" ***** %s\n", argv[2]);
+	printf(" ***** %s\n", getenv ("BUILD_ROOT"));
+
+	
+
+	local_argc = argc;
+	local_argv = argv;
 
 	sc_clock clk("clk", 10, SC_NS, 0.5);   // Create a clock signal
 

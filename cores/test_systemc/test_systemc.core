@@ -20,3 +20,6 @@ libs = -L/opt/or1ksim/lib -lsim -lpthread
 
 [verilog]
 src_files = gpio.v
+
+[scripts]
+pre_build_scripts = sw/build
