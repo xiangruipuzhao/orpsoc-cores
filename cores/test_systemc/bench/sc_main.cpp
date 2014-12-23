@@ -7,11 +7,14 @@
 #include "wb_xfer.h"
 #include "or1ksim.h"
 
+#define OR1KSIM_CONF_FILE	"/sw/or1ksim.cfg"
+#define OR1K_TEST_PROG		"/sw/or1k_test"
+
 Vgpio *DUT  = new Vgpio("Vgpio");
 wb_master *MASTER = new wb_master("wb_master");
 
-char **local_argv;
-int local_argc;
+char *or1ksim_argv[10];
+int or1ksim_argc;
 
 void xfer_finished(void)
 {
@@ -68,7 +71,7 @@ void *test_thread(void *arg)
 
 	while(!(MASTER->master_ready()));
 
-	ret = or1ksim_init(local_argc, local_argv, NULL, generic_read, generic_write);
+	ret = or1ksim_init(or1ksim_argc, or1ksim_argv, NULL, generic_read, generic_write);
 	if (ret) {
 		printf("or1ksim_init failed (%d)\n", ret);
 	}
@@ -112,14 +115,17 @@ int sc_main(int argc, char* argv[])
 	sc_signal	< uint32_t >	gpio_o;
 	sc_signal	< uint32_t >	gpio_dir;
 
-	printf(" ***** %s\n", argv[0]);
-	printf(" ***** %s\n", argv[1]);
-	printf(" ***** %s\n", getenv ("BUILD_ROOT"));
+	or1ksim_argc = 4;
+	or1ksim_argv[0] = NULL;
+	or1ksim_argv[1] = "-f";
 
-	
+	or1ksim_argv[2] = (char *)malloc(strlen(getenv("BUILD_ROOT")) + strlen(OR1KSIM_CONF_FILE));
+	strcpy(or1ksim_argv[2], getenv("BUILD_ROOT"));
+	strcat(or1ksim_argv[2], OR1KSIM_CONF_FILE);
 
-	local_argc = argc;
-	local_argv = argv;
+	or1ksim_argv[3] = (char *)malloc(strlen(getenv("BUILD_ROOT")) + strlen(OR1K_TEST_PROG));
+	strcpy(or1ksim_argv[3], getenv("BUILD_ROOT"));
+	strcat(or1ksim_argv[3], OR1K_TEST_PROG);
 
 	sc_clock clk("clk", 10, SC_NS, 0.5);   // Create a clock signal
 

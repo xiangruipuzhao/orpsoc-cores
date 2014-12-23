@@ -1,7 +1,7 @@
 #!/bin/bash
 
 _CROSS_COMPILE_=/opt/or1k-toolchain/bin/or1k-elf-gcc
-_TARGET_="or1k_main__p"
+_TARGET_="or1k_test"
 
 if [ ! -d ${BUILD_ROOT}/sw ]; then
 	mkdir ${BUILD_ROOT}/sw
