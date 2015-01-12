@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include "/home/franck/openrisc/upstream/fusesoc/build/test_systemc/sim-verilator/obj_dir/Vgpio.h"
+#include <Vgpio.h>
 #include "wb_master.h"
 #include "wb_xfer.h"
 #include "or1ksim.h"
@@ -257,9 +257,16 @@ int sc_main(int argc, char* argv[])
 	sc_signal	< uint32_t >	gpio_o;
 	sc_signal	< uint32_t >	gpio_dir;
 
+	printf("\n");
+
 	or1ksim_argc = 4;
 	or1ksim_argv[0] = NULL;
 	or1ksim_argv[1] = "-f";
+
+	if (!getenv("BUILD_ROOT")) {
+		printf("ERROR: No BUILD_ROOT found in your environment\n");
+		return -1;
+	}
 
 	or1ksim_argv[2] = (char *)malloc(strlen(getenv("BUILD_ROOT")) + strlen(OR1KSIM_CONF_FILE));
 	strcpy(or1ksim_argv[2], getenv("BUILD_ROOT"));
