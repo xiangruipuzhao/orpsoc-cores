@@ -6,6 +6,7 @@
 #include "wb_master.h"
 #include "wb_xfer.h"
 #include "or1ksim.h"
+#include "generic.h"
 
 #define OR1KSIM_CONF_FILE	"/sw/or1ksim.cfg"
 #define OR1K_TEST_PROG		"/sw/or1k_test"
@@ -21,197 +22,13 @@ void xfer_finished(void)
 	cout << "Xfer finished" << endl;
 }
 
-uint8_t wb_read8(uint32_t addr, void (*done)(void))
-{
-	return 0;
-}
-
-uint16_t wb_read16(uint32_t addr, void (*done)(void))
-{
-	return 0;
-}
-
-uint32_t wb_read32(uint32_t addr, void (*done)(void))
-{
-	return 0;
-}
-
-void wb_write8(uint32_t addr, uint8_t data, void (*done)(void))
-{
-
-}
-
-void wb_write16(uint32_t addr, uint16_t data, void (*done)(void))
-{
-
-}
-
-void wb_write32(uint32_t addr, uint32_t data, void (*done)(void))
-{
-	MASTER->xfer.cyc = 1;
-	MASTER->xfer.stb = 1;
-	MASTER->xfer.adr = addr;
-	MASTER->xfer.we  = 0;
-	MASTER->xfer.dat_o = data;
-	MASTER->xfer.done = done;
-	MASTER->xfer.busy = 1;
-
-	MASTER->start_xfer();
-
-	pthread_mutex_lock(MASTER->xfer.mutex);
-	while (MASTER->xfer.busy)
-		pthread_cond_wait(MASTER->xfer.cond, MASTER->xfer.mutex);
-	pthread_mutex_unlock(MASTER->xfer.mutex);
-}
-
-unsigned long int get_adr_from_mask(unsigned long int addr, unsigned char mask[])
-{
-	if (mask[0] == 0xff)
-		return addr;
-
-	if (mask[1] == 0xff)
-		return addr + 1;
-
-	if (mask[2] == 0xff)
-		return addr + 2;
-
-	if (mask[3] == 0xff)
-		return addr + 3;
-
-	return addr;
-}
-
-unsigned long int get_dat_from_mask(unsigned char wdata[], unsigned char mask[], int data_len)
-{
-	if (data_len == 4)
-		return (wdata[0] << 24) + (wdata[1] << 16) + (wdata[2] << 8) + wdata[3];
-
-	if (data_len == 2) {
-		if (mask[0] == 0xff)
-			return (wdata[0] << 8) + wdata[1];
-		else
-			return (wdata[2] << 8) + wdata[3];
-	}
-
-	if (data_len == 1) {
-		if (mask[0] == 0xff)
-			return wdata[0];
-		if (mask[1] == 0xff)
-			return wdata[1];
-		if (mask[2] == 0xff)
-			return wdata[2];
-		if (mask[3] == 0xff)
-			return wdata[3];
-	}
-
-	return 0;
-}
-
-int set_data_from_mask(unsigned char *rdata, unsigned long data, unsigned char mask[], int data_len)
-{
-	if (data_len == 4) {
-		rdata[0] = (data >> 24) & 0xff;
-		rdata[1] = (data >> 16) & 0xff;
-		rdata[2] = (data >> 8) & 0xff;
-		rdata[3] = data & 0xff;
-		return 0;
-	}
-
-	if (data_len == 2) {
-		if (mask[0] == 0xff) {
-			rdata[0] = (data >> 24) & 0xff;
-			rdata[1] = (data >> 16) & 0xff;
-			return 0;
-		} else {
-			rdata[2] = (data >> 8) & 0xff;
-			rdata[3] = data & 0xff;
-			return 0;
-		}
-	}
-
-	if (data_len == 1) {
-		if (mask[0] == 0xff) {
-			rdata[0] = (data >> 24) & 0xff;
-			return 0;
-		}
-		if (mask[1] == 0xff) {
-			rdata[1] = (data >> 16) & 0xff;
-			return 0;
-		}
-		if (mask[2] == 0xff) {
-			rdata[2] = (data >> 8) & 0xff;
-			return 0;
-		}
-		if (mask[3] == 0xff) {
-			rdata[3] = data & 0xff;
-			return 0;
-		}
-	}
-
-	return 0;
-}
-
-int generic_read(void *class_ptr, unsigned long int addr, unsigned char mask[], unsigned char rdata[], int data_len)
-{
-	unsigned long int address;
-	unsigned long int data;
-
-	address = get_adr_from_mask(addr, mask);
-
-	switch (data_len) {
-	case 1:
-		data = wb_read8(address, NULL);
-		printf("READ8 : 0x%08lX -> %08X\n", address, data);
-		break;
-	case 2:
-		data = wb_read16(address, NULL);
-		printf("READ16: 0x%08lX -> %08X\n", address, data);
-		break;
-	case 4:
-		data = wb_read32(address, NULL);
-		printf("READ32: 0x%08lX -> %08X\n", address, data);
-		break;
-	}
-
-	/* TEST VALUE */
-	data = 0x11223344;
-
-	set_data_from_mask(rdata, data, mask, data_len);
-
-	return 0;
-}
-
-int generic_write(void *class_ptr, unsigned long int addr, unsigned char mask[], unsigned char wdata[], int data_len)
-{
-	unsigned long int address;
-	unsigned long int data;
-
-	address = get_adr_from_mask(addr, mask);
-	data = get_dat_from_mask(wdata, mask, data_len);
-
-	switch (data_len) {
-	case 1:
-		wb_write8(address, data, NULL);
-		printf("WRITE8 : %x at 0x%08lX\n", data, address);
-		break;
-	case 2:
-		wb_write16(address, data, NULL);
-		printf("WRITE16: %x at 0x%08lX\n", data, address);
-		break;
-	case 4:
-		wb_write32(address, data, NULL);
-		printf("WRITE32: %x at 0x%08lX\n", data, address);
-		break;
-	}
-
-	return 0;
-}
-
 void *test_thread(void *arg)
 {
 	int ret;
 
 	while(!(MASTER->master_ready()));
+
+	generic_set_master(MASTER);
 
 	ret = or1ksim_init(or1ksim_argc, or1ksim_argv, NULL, generic_read, generic_write);
 	if (ret) {
@@ -220,15 +37,7 @@ void *test_thread(void *arg)
 
 	ret = or1ksim_run(2);
 	printf("or1ksim_run returned %d\n", ret);
-/*
-	while(!(MASTER->master_ready()));
 
-	usleep(10);
-
-	wb_write32(0x5588, 0x65, NULL);
-
-	wb_write32(0x11223344, 0x998877EE, xfer_finished);
-*/
 	usleep(10);
 
 	sc_stop();

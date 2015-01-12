@@ -8,12 +8,14 @@ verilator_options = -Wno-fatal --trace
 tb_toplevel   = bench/sc_main.cpp
 source_type = systemC
 src_files = bench/sc_main.cpp
+            bench/generic.cpp
 
 include_files =
  bench/wb_master.h
  bench/wb_xfer.h
  bench/thread_safe_event.h
  bench/or1ksim.h
+ bench/generic.h
 
 top_module = gpio
 libs = -L/opt/or1ksim/lib -lsim -lpthread

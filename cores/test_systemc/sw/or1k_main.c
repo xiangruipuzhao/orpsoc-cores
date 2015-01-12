@@ -19,13 +19,12 @@ int main(void)
 	writew(0x1122, (void *)(GENERIC_PERIPHERAL + 2));
 
 	printf("--> %x\n", readb((void *)GENERIC_PERIPHERAL));
-	printf("--> %x\n", readw((void *)GENERIC_PERIPHERAL));
-	printf("--> %x\n", readl((void *)GENERIC_PERIPHERAL));
-
 	printf("--> %x\n", readb((void *)GENERIC_PERIPHERAL + 1));
 	printf("--> %x\n", readb((void *)GENERIC_PERIPHERAL + 2));
 	printf("--> %x\n", readb((void *)GENERIC_PERIPHERAL + 3));
+	printf("--> %x\n", readw((void *)GENERIC_PERIPHERAL));
 	printf("--> %x\n", readw((void *)GENERIC_PERIPHERAL + 2));
+	printf("--> %x\n", readl((void *)GENERIC_PERIPHERAL));
 
 	return 0;
 }
