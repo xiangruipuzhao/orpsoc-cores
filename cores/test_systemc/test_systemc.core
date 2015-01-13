@@ -9,6 +9,7 @@ tb_toplevel   = bench/sc_main.cpp
 source_type = systemC
 src_files = bench/sc_main.cpp
             bench/generic.cpp
+            bench/wb_master.cpp
 
 include_files =
  bench/wb_master.h

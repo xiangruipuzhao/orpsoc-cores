@@ -15,6 +15,7 @@ struct wb_xfer {
 	bool ack;
 	bool err;
 	bool rty;
+	uint32_t sel;
 
 	bool busy;
 	void (*done)(void);

@@ -62,6 +62,7 @@ int sc_main(int argc, char* argv[])
 	sc_signal	< bool >	wb_ack;
 	sc_signal	< bool >	wb_err;
 	sc_signal	< bool >	wb_rty;
+	sc_signal	< uint32_t >	wb_sel;
 	sc_signal	< uint32_t >	gpio_i;
 	sc_signal	< uint32_t >	gpio_o;
 	sc_signal	< uint32_t >	gpio_dir;
@@ -101,6 +102,7 @@ int sc_main(int argc, char* argv[])
 	MASTER->wb_ack(wb_ack);
 	MASTER->wb_err(wb_err);
 	MASTER->wb_rty(wb_rty);
+	MASTER->wb_sel(wb_sel);
 
 	DUT->wb_clk(clk);
 	DUT->wb_rst(rst);
@@ -133,6 +135,7 @@ int sc_main(int argc, char* argv[])
 	sc_trace(fp, wb_dat_o, "wb_dat_o");             // Add signals to trace file
 	sc_trace(fp, wb_we, "wb_we");             // Add signals to trace file
 	sc_trace(fp, wb_ack, "wb_ack");             // Add signals to trace file
+	sc_trace(fp, wb_sel, "wb_sel");             // Add signals to trace file
 
 	if (pthread_create (&th1, NULL, test_thread, NULL) < 0) {
 		printf("pthread_create error for thread 1\n");

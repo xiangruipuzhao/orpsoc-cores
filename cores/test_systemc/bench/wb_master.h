@@ -13,6 +13,7 @@ SC_MODULE(wb_master) {
 	sc_out	< bool >	wb_cyc;
 	sc_out	< bool >	wb_stb;
 	sc_out	< uint32_t >	wb_cti;
+	sc_out	< uint32_t >	wb_sel;
 	sc_out	< uint32_t >	wb_bte;
 	sc_out	< uint32_t >	wb_dat_o;
 	sc_in	< bool >	wb_ack;
@@ -31,49 +32,10 @@ SC_MODULE(wb_master) {
 	pthread_mutex_t mutex;
 	pthread_cond_t cond;
 
-	int master_ready() {
-		return do_poll_ack_rdy & do_xfer_rdy;
-	}
-
-	void do_poll_ack() {
-		while (true) {
-			do_poll_ack_rdy = 1;
-			wait();
-			if (wb_ack && xfer_started) {
-				pthread_mutex_lock(xfer.mutex);
-				xfer_started = 0;
-				pthread_mutex_unlock(xfer.mutex);
-				e2.notify(SC_ZERO_TIME);
-			}
-			local_ack = wb_ack;
-		}
-	}
-
-	void do_xfer() {
-		while (true) {
-			do_xfer_rdy = 1;
-			wait(safe_ev.default_event());
-			wb_cyc = xfer.cyc;
-			wb_stb = xfer.stb;
-			wb_adr = xfer.adr;
-			wb_we  = xfer.we;
-			wb_dat_o = xfer.dat_o;
-			pthread_mutex_lock(xfer.mutex);
-			xfer_started = 1;
-			pthread_mutex_unlock(xfer.mutex);
-			wait(e2);
-			wb_cyc = 0;
-			wb_stb = 0;
-
-			pthread_mutex_lock(xfer.mutex);
-			xfer.busy = 0;
-			pthread_cond_signal(xfer.cond);
-			pthread_mutex_unlock(xfer.mutex);
-
-			if (xfer.done)
-				xfer.done();
-		}
-	}
+	int master_ready();
+	void do_poll_ack();
+	void do_xfer();
+	void start_xfer();
 
 	SC_HAS_PROCESS(wb_master);
 	wb_master(sc_module_name name_) : sc_module(name_), safe_ev("safe_ev") {
@@ -93,9 +55,5 @@ SC_MODULE(wb_master) {
 
 		xfer.mutex = &mutex;
 		xfer.cond = &cond;
-	}
-
-	void start_xfer() {
-		safe_ev.notify();
 	}
 };
