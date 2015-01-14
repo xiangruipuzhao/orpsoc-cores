@@ -2,6 +2,7 @@ CAPI=1
 [main]
 description = "SystemC test project"
 simulators = verilator
+depend = wb_intercon
 
 [verilator]
 verilator_options = -Wno-fatal --trace
@@ -18,11 +19,16 @@ include_files =
  bench/or1ksim.h
  bench/generic.h
 
-top_module = gpio
+top_module = bench
+
 libs = -L/opt/or1ksim/lib -lsim -lpthread
 
 [verilog]
 src_files = gpio.v
+            bench/wb_intercon.v
+            bench/bench.v
+include_files =
+            bench/wb_intercon.vh
 
 [scripts]
 pre_build_scripts = sw/build

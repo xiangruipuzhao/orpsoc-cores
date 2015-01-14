@@ -21,7 +21,6 @@ SC_MODULE(wb_master) {
 	sc_in	< bool >	wb_rty;
 
 	sc_event e2;
-	bool local_ack;
 	bool xfer_started;
 
 	struct wb_xfer xfer;
@@ -38,6 +37,7 @@ SC_MODULE(wb_master) {
 	void start_xfer();
 
 	SC_HAS_PROCESS(wb_master);
+
 	wb_master(sc_module_name name_) : sc_module(name_), safe_ev("safe_ev") {
 		SC_THREAD(do_xfer);
 		dont_initialize();
