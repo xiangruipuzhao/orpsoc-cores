@@ -65,7 +65,10 @@ int sc_main(int argc, char* argv[])
 	sc_signal	< bool >	wb_s2m_master_err;
 	sc_signal	< bool >	wb_s2m_master_rty;
 	sc_signal	< uint32_t >	wb_m2s_master_sel;
-	sc_signal	< uint32_t >	gpio_io;
+	sc_signal	< bool >	sck;
+	sc_signal	< bool >	ss;
+	sc_signal	< bool >	mosi;
+	sc_signal	< bool >	miso;
 
 	printf("\n");
 
@@ -126,7 +129,10 @@ int sc_main(int argc, char* argv[])
 	DUT->wb_s2m_master_err(wb_s2m_master_err);
 	DUT->wb_s2m_master_rty(wb_s2m_master_rty);
 
-	DUT->gpio_io(gpio_io);
+	DUT->sck(sck);
+	DUT->ss(ss);
+	DUT->mosi(mosi);
+	DUT->miso(miso);
 
 	sc_trace_file *fp;
 	fp=sc_create_vcd_trace_file("wave");
@@ -142,7 +148,9 @@ int sc_main(int argc, char* argv[])
 	sc_trace(fp, wb_m2s_master_we, "wb_m2s_master_we");
 	sc_trace(fp, wb_s2m_master_ack, "wb_s2m_master_ack");
 	sc_trace(fp, wb_m2s_master_sel, "wb_m2s_master_sel");
-	//sc_trace(fp, DUT->v->gpio->wb_adr_i, "gpio.wb_adr_i");
+	sc_trace(fp, sck, "sck");
+	sc_trace(fp, ss, "ss");
+	sc_trace(fp, mosi, "mosi");
 
 	if (pthread_create (&th1, NULL, test_thread, NULL) < 0) {
 		printf("pthread_create error for thread 1\n");
