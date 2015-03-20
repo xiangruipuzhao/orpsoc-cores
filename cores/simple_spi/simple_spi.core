@@ -12,22 +12,22 @@ tb_toplevel       = bench/sc_main.cpp
 src_files         = bench/sc_main.cpp
 top_module        = bench
 libs              = -L/opt/or1ksim/lib -lsim -lpthread
+tb_src_files      = bench/wb_intercon.v
+                    bench/bench.v
+                    bench/timescale.v
+tb_include_files  = bench/wb_intercon.vh
+                    bench/timescale.v
 
 [verilog]
 src_files =
- fifo4.v
- simple_spi_top.v
- bench/wb_intercon.v
- bench/bench.v
-include_files =
- bench/wb_intercon.vh
- bench/timescale.v
+ rtl/verilog/fifo4.v
+ rtl/verilog/simple_spi_top.v
  
 [provider]
-name = opencores
-repo_name = simple_spi
-repo_root = trunk/rtl/verilog
-revision = 10
+name = github
+user = olofk
+repo = simple_spi
+cachable = true
 
 [scripts]
 pre_build_scripts = sw/build
