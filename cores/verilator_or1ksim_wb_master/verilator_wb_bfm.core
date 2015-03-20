@@ -12,5 +12,4 @@ include_files =
  wb_master.h
  wb_xfer.h
  thread_safe_event.h
- or1ksim.h
  generic.h
