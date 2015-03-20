@@ -25,26 +25,9 @@
 
 #include <stdint.h>
 #include "io.h"
+#include "lib-simple_spi.h"
 
-#define IO_OFFSET	0
-#define DIR_OFFSET	1
-
-void gpio_write(uint32_t base, uint8_t val)
+void set_chipselect(uint32_t base, uint8_t val)
 {
-	writeb(val, (uint8_t *)(base + IO_OFFSET));
-}
-
-uint8_t gpio_read(uint32_t base)
-{
-	return readb((uint8_t *)(base + IO_OFFSET));
-}
-
-void gpio_set_dir(uint32_t base, uint8_t val)
-{
-	writeb(val, (uint8_t *)(base + DIR_OFFSET));
-}
-
-uint8_t gpio_get_dir(uint32_t base, uint8_t val)
-{
-	return readb((uint8_t *)(base + DIR_OFFSET));
+	writeb(val, (uint8_t *)(base + SS));
 }

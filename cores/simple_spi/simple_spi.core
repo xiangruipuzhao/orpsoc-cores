@@ -3,7 +3,6 @@ CAPI=1
 description = "OpenCores SPI Core"
 simulators = verilator
 depend = wb_intercon
-         verilator_tb_utils
          verilator_or1ksim_wb_master
 
 [verilator]

@@ -4,7 +4,6 @@
 #include <semaphore.h>
 #include "wb_master.h"
 #include "wb_xfer.h"
-#include "or1ksim.h"
 
 wb_master *master;
 
@@ -19,7 +18,6 @@ uint32_t wb_read32(wb_master *wb_master, uint32_t addr, unsigned char mask[], vo
 	wb_master->xfer.stb = 1;
 	wb_master->xfer.adr = addr;
 	wb_master->xfer.we  = 0;
-	//wb_master->xfer.dat_o = data;
 	wb_master->xfer.done = done;
 	wb_master->xfer.busy = 1;
 	wb_master->xfer.sel = mask_to_sel(mask);
@@ -70,7 +68,7 @@ int generic_write(void *class_ptr, unsigned long int addr, unsigned char mask[],
 {
 	uint32_t data;
 
-	data = (wdata[0] << 24);
+	data = (wdata[0] << 24) + (wdata[1] << 16) + (wdata[2] << 8) + wdata[3];
 
 	wb_write32(master, addr, data, mask, NULL);
 	return 0;
