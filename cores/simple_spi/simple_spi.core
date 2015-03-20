@@ -3,32 +3,16 @@ CAPI=1
 description = "OpenCores SPI Core"
 simulators = verilator
 depend = wb_intercon
+         verilator_tb_utils
+         verilator_or1ksim_wb_master
 
 [verilator]
+source_type       = systemC
 verilator_options = -Wno-fatal --trace
-tb_toplevel   = bench/sc_main.cpp
-source_type = systemC
-src_files = bench/sc_main.cpp
-            bench/generic.cpp
-            bench/wb_master.cpp
-
-tb_src_files =
-
-
-tb_include_files = 
-
-
-include_files =
- bench/wb_master.h
- bench/wb_xfer.h
- bench/thread_safe_event.h
- bench/or1ksim.h
- bench/generic.h
- bench/timescale.v
-
-top_module = bench
-
-libs = -L/opt/or1ksim/lib -lsim -lpthread
+tb_toplevel       = bench/sc_main.cpp
+src_files         = bench/sc_main.cpp
+top_module        = bench
+libs              = -L/opt/or1ksim/lib -lsim -lpthread
 
 [verilog]
 src_files =
@@ -38,6 +22,7 @@ src_files =
  bench/bench.v
 include_files =
  bench/wb_intercon.vh
+ bench/timescale.v
  
 [provider]
 name = opencores

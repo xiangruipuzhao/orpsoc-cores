@@ -1,0 +1,16 @@
+CAPI=1
+[main]
+description = "Verilator or1ksim controlled wb master"
+simulators = verilator
+
+[verilator]
+source_type = systemC
+src_files = generic.cpp
+            wb_master.cpp
+
+include_files =
+ wb_master.h
+ wb_xfer.h
+ thread_safe_event.h
+ or1ksim.h
+ generic.h

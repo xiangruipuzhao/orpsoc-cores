@@ -14,6 +14,6 @@
 
 int main(void)
 {
-	writeb(0x1, (void *)SIMPLE_SPI + 4);
+	writeb(0x1, (void *)SIMPLE_SPI_BASE + 4);
 	return 0;
 }

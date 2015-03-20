@@ -5,9 +5,10 @@
 #include <Vbench.h>
 #include "verilated.h"
 #include "verilated_vcd_c.h"
-#include <verilator_wb_bfm/wb_master.h>
-#include "verilator_wb_bfm/or1ksim.h"
-#include "verilator_wb_bfm/generic.h"
+#include "wb_master.h"
+#include "wb_xfer.h"
+#include "or1ksim.h"
+#include "generic.h"
 
 #define OR1KSIM_CONF_FILE	"/sw/or1ksim.cfg"
 #define OR1K_TEST_PROG		"/sw/or1k_test"
