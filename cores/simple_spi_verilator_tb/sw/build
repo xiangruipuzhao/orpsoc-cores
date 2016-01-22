@@ -1,0 +1,22 @@
+#!/bin/bash
+
+_CROSS_COMPILE_=/opt/or1k-toolchain/bin/or1k-elf-gcc
+_TARGET_="or1k_test"
+
+if [ ! -d ${BUILD_ROOT}/sw ]; then
+	mkdir ${BUILD_ROOT}/sw
+fi
+
+# Copy files to the build directory (not handled by fusesoc)
+cp -rf ${CORE_ROOT}/sw/* ${BUILD_ROOT}/sw
+
+# Make the target
+cd  ${BUILD_ROOT}/sw
+make CROSS_COMPILE=$_CROSS_COMPILE_ TARGET=$_TARGET_
+
+# Check if the file was created
+if [ -f $_TARGET_ ]; then
+	exit 0
+fi
+
+exit 1

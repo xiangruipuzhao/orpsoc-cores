@@ -1,0 +1,33 @@
+CAPI=1
+[main]
+description = "OpenCores SPI Core"
+simulators = verilator
+depend = wb_intercon
+         verilator_or1ksim_wb_master
+
+[verilator]
+source_type       = systemC
+verilator_options = -Wno-fatal --trace
+tb_toplevel       = bench/sc_main.cpp
+src_files         = bench/sc_main.cpp
+top_module        = bench
+libs              = -L/opt/or1ksim/lib -lsim -lpthread
+tb_src_files      = bench/wb_intercon.v
+                    bench/bench.v
+                    bench/timescale.v
+tb_include_files  = bench/wb_intercon.vh
+                    bench/timescale.v
+
+[verilog]
+src_files =
+ rtl/verilog/fifo4.v
+ rtl/verilog/simple_spi_top.v
+ 
+[provider]
+name = github
+user = olofk
+repo = simple_spi
+cachable = true
+
+[scripts]
+pre_build_scripts = sw/build
