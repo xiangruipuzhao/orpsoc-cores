@@ -12,11 +12,7 @@ tb_toplevel       = bench/sc_main.cpp
 src_files         = bench/sc_main.cpp
 top_module        = bench
 libs              = -L/opt/or1ksim/lib -lsim -lpthread
-tb_src_files      = bench/wb_intercon.v
-                    bench/bench.v
-                    bench/timescale.v
-tb_include_files  = bench/wb_intercon.vh
-                    bench/timescale.v
+include_files     = bench/or1ksim.h
 
 [verilog]
 src_files =
