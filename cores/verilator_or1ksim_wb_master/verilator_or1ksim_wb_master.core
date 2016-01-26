@@ -13,10 +13,3 @@ include_files =
  wb_xfer.h
  thread_safe_event.h
  generic.h
-
-[verilog]
-src_files      = wb_intercon.v
-                    bench.v
-                    timescale.v
-include_files  = wb_intercon.vh
-                    timescale.v

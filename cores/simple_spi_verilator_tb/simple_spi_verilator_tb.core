@@ -18,7 +18,13 @@ include_files     = bench/or1ksim.h
 src_files =
  rtl/verilog/fifo4.v
  rtl/verilog/simple_spi_top.v
- 
+ bench/verilog/wb_intercon.v
+ bench/verilog/bench.v
+ bench/verilog/timescale.v
+include_files  =
+ bench/verilog/wb_intercon.vh
+ bench/verilog/timescale.v
+
 [provider]
 name = github
 user = olofk
