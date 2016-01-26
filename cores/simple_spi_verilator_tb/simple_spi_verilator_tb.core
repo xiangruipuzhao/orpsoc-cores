@@ -14,16 +14,28 @@ top_module        = bench
 libs              = -L/opt/or1ksim/lib -lsim -lpthread
 include_files     = bench/or1ksim.h
 
-[verilog]
-src_files =
- rtl/verilog/fifo4.v
- rtl/verilog/simple_spi_top.v
+[fileset tb_src]
+files =
  bench/verilog/wb_intercon.v
  bench/verilog/bench.v
+file_type=verilogSource
+usage=verilator
+scope = private
+
+[fileset tb_includes]
+files =
  bench/verilog/timescale.v
-include_files  =
  bench/verilog/wb_intercon.vh
- bench/verilog/timescale.v
+is_include_file = true
+usage=verilator
+scope = private
+
+[fileset simple_spi_src]
+files=
+ rtl/verilog/fifo4.v
+ rtl/verilog/simple_spi_top.v
+file_type=verilogSource
+usage=sim, synth
 
 [provider]
 name = github
