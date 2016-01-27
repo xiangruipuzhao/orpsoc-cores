@@ -16,7 +16,7 @@
 Vbench *DUT  = new Vbench("Vbench");
 wb_master *MASTER = new wb_master("wb_master");
 
-char *or1ksim_argv[10];
+char *or1ksim_argv[4];
 int or1ksim_argc;
 
 void xfer_finished(void)
@@ -87,11 +87,11 @@ int sc_main(int argc, char* argv[])
 		return -1;
 	}
 
-	or1ksim_argv[2] = (char *)malloc(strlen(getenv("BUILD_ROOT")) + strlen(OR1KSIM_CONF_FILE));
+	or1ksim_argv[2] = (char *)malloc(strlen(getenv("BUILD_ROOT")) + strlen(OR1KSIM_CONF_FILE) + 1);
 	strcpy(or1ksim_argv[2], getenv("BUILD_ROOT"));
 	strcat(or1ksim_argv[2], OR1KSIM_CONF_FILE);
 
-	or1ksim_argv[3] = (char *)malloc(strlen(getenv("BUILD_ROOT")) + strlen(OR1K_TEST_PROG));
+	or1ksim_argv[3] = (char *)malloc(strlen(getenv("BUILD_ROOT")) + strlen(OR1K_TEST_PROG) + 1);
 	strcpy(or1ksim_argv[3], getenv("BUILD_ROOT"));
 	strcat(or1ksim_argv[3], OR1K_TEST_PROG);
 
